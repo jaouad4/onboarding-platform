@@ -4,22 +4,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module.js';
-import { MailModule } from './mail/mail.module.js';
-let AppModule = class AppModule {
+import { Module, Global } from '@nestjs/common';
+import { MailService } from './mail.service.js';
+let MailModule = class MailModule {
 };
-AppModule = __decorate([
+MailModule = __decorate([
+    Global(),
     Module({
-        imports: [
-            ConfigModule.forRoot({
-                isGlobal: true,
-            }),
-            PrismaModule,
-            MailModule,
-        ],
+        providers: [MailService],
+        exports: [MailService],
     })
-], AppModule);
-export { AppModule };
-//# sourceMappingURL=app.module.js.map
+], MailModule);
+export { MailModule };
+//# sourceMappingURL=mail.module.js.map
