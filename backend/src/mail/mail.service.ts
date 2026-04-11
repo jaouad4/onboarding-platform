@@ -40,13 +40,7 @@ export class MailService {
   }
 
   async sendWelcomeEmail(payload: WelcomeEmailPayload): Promise<void> {
-    const {
-      firstName,
-      lastName,
-      username,
-      email,
-      plainPassword,
-    } = payload;
+    const { firstName, lastName, username, email, plainPassword } = payload;
     const platformUrl = process.env.PLATFORM_URL ?? 'http://localhost:3000';
     const fromName = process.env.SMTP_FROM_NAME ?? 'SMODU Platform';
     const fromEmail = process.env.SMTP_FROM_EMAIL ?? 'no-reply@smodu.ma';
@@ -76,7 +70,9 @@ export class MailService {
       );
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const previewUrl = nodemailer.getTestMessageUrl(info as nodemailer.SentMessageInfo);
+      const previewUrl = nodemailer.getTestMessageUrl(
+        info as nodemailer.SentMessageInfo,
+      );
       if (previewUrl) {
         this.logger.log(`Preview Ethereal : ${previewUrl}`);
       }
