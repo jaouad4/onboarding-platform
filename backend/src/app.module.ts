@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module.js';
     PrismaModule,
     MailModule,
     AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

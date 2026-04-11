@@ -18,6 +18,7 @@ AppModule = __decorate([
             PrismaModule,
             MailModule,
             AuthModule,
+            UsersModule,
         ],
     })
 ], AppModule);

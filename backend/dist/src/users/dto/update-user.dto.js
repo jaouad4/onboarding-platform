@@ -1,0 +1,67 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, Matches, MinLength, } from 'class-validator';
+import { Domain, Role } from '@prisma/client';
+export class UpdateUserDto {
+    firstName;
+    lastName;
+    username;
+    password;
+    email;
+    domain;
+    role;
+    isActive;
+}
+__decorate([
+    IsOptional(),
+    IsString(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "firstName", void 0);
+__decorate([
+    IsOptional(),
+    IsString(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "lastName", void 0);
+__decorate([
+    IsOptional(),
+    IsString(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "username", void 0);
+__decorate([
+    IsOptional(),
+    IsString(),
+    MinLength(8),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "password", void 0);
+__decorate([
+    IsOptional(),
+    IsEmail(),
+    Matches(/^[^@]+@smodu\.ma$/, {
+        message: 'L\'email doit se terminer par @smodu.ma',
+    }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "email", void 0);
+__decorate([
+    IsOptional(),
+    IsEnum(Domain),
+    __metadata("design:type", typeof (_a = typeof Domain !== "undefined" && Domain) === "function" ? _a : Object)
+], UpdateUserDto.prototype, "domain", void 0);
+__decorate([
+    IsOptional(),
+    IsEnum(Role),
+    __metadata("design:type", typeof (_b = typeof Role !== "undefined" && Role) === "function" ? _b : Object)
+], UpdateUserDto.prototype, "role", void 0);
+__decorate([
+    IsOptional(),
+    IsBoolean(),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "isActive", void 0);
+//# sourceMappingURL=update-user.dto.js.map
