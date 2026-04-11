@@ -12,7 +12,6 @@ import { ConflictException, Injectable, Logger, NotFoundException, } from '@nest
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import * as bcrypt from 'bcrypt';
-import { UserStatus } from '@prisma/client';
 let UsersService = UsersService_1 = class UsersService {
     prisma;
     mailService;
@@ -26,7 +25,7 @@ let UsersService = UsersService_1 = class UsersService {
             where: { username: dto.username },
         });
         if (existing) {
-            throw new ConflictException('Ce nom d\'utilisateur est deja utilise');
+            throw new ConflictException("Ce nom d'utilisateur est deja utilise");
         }
         if (dto.email) {
             const emailExists = await this.prisma.user.findUnique({
@@ -47,22 +46,30 @@ let UsersService = UsersService_1 = class UsersService {
                 email: dto.email ?? null,
                 domain: dto.domain,
                 role: dto.role ?? 'USER',
-                status: UserStatus.PENDING_CERTIFICATION,
+                status: 'PENDING_CERTIFICATION',
                 isActive: true,
             },
         });
         if (user.email) {
             try {
-                await this.mailService.sendWelcomeEmail(user, plainPassword);
+                await this.mailService.sendWelcomeEmail({
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    plainPassword,
+                });
             }
-            catch (error) {
-                this.logger.warn(`Echec de l'envoi de l'email de bienvenue pour l'utilisateur ${user.username}: ${error.message}`);
+            catch (err) {
+                const message = err instanceof Error ? err.message : String(err);
+                this.logger.warn(`Echec de l'envoi de l'email de bienvenue pour l'utilisateur ${user.username}: ${message}`);
             }
         }
         else {
             this.logger.log(`Aucun email renseigne pour l'utilisateur ${user.username}. Email de bienvenue non envoye.`);
         }
-        const { password: _, ...result } = user;
+        const { password: _pw, ...result } = user;
+        void _pw;
         return result;
     }
     async findAll(dto) {
@@ -138,7 +145,7 @@ let UsersService = UsersService_1 = class UsersService {
                 where: { username: dto.username, NOT: { id } },
             });
             if (conflict) {
-                throw new ConflictException('Ce nom d\'utilisateur est deja utilise');
+                throw new ConflictException("Ce nom d'utilisateur est deja utilise");
             }
         }
         if (dto.email) {

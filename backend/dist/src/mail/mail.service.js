@@ -25,7 +25,7 @@ let MailService = MailService_1 = class MailService {
         });
     }
     async sendWelcomeEmail(payload) {
-        const { firstName, lastName, username, email, plainPassword, } = payload;
+        const { firstName, lastName, username, email, plainPassword } = payload;
         const platformUrl = process.env.PLATFORM_URL ?? 'http://localhost:3000';
         const fromName = process.env.SMTP_FROM_NAME ?? 'SMODU Platform';
         const fromEmail = process.env.SMTP_FROM_EMAIL ?? 'no-reply@smodu.ma';

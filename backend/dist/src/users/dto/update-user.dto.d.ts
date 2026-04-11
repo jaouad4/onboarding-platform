@@ -1,4 +1,4 @@
-import { Domain, Role } from '@prisma/client';
+import { Domain, Role } from './create-user.dto.js';
 export declare class UpdateUserDto {
     firstName?: string;
     lastName?: string;

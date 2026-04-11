@@ -7,10 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c;
 import { IsEnum, IsInt, IsOptional, IsPositive, Max } from 'class-validator';
-import { Transform } from 'class-transformer';
-import { Domain, Role, UserStatus } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { Domain, Role } from './create-user.dto.js';
+export var UserStatus;
+(function (UserStatus) {
+    UserStatus["PENDING_CERTIFICATION"] = "PENDING_CERTIFICATION";
+    UserStatus["CERTIFICATION_SUBMITTED"] = "CERTIFICATION_SUBMITTED";
+    UserStatus["CERTIFICATION_VERIFIED"] = "CERTIFICATION_VERIFIED";
+    UserStatus["READY"] = "READY";
+})(UserStatus || (UserStatus = {}));
 export class ListUsersDto {
     page = 1;
     limit = 20;
@@ -20,14 +26,14 @@ export class ListUsersDto {
 }
 __decorate([
     IsOptional(),
-    Transform(({ value }) => parseInt(value, 10)),
+    Type(() => Number),
     IsInt(),
     IsPositive(),
     __metadata("design:type", Number)
 ], ListUsersDto.prototype, "page", void 0);
 __decorate([
     IsOptional(),
-    Transform(({ value }) => parseInt(value, 10)),
+    Type(() => Number),
     IsInt(),
     IsPositive(),
     Max(100),
@@ -36,16 +42,16 @@ __decorate([
 __decorate([
     IsOptional(),
     IsEnum(UserStatus),
-    __metadata("design:type", typeof (_a = typeof UserStatus !== "undefined" && UserStatus) === "function" ? _a : Object)
+    __metadata("design:type", String)
 ], ListUsersDto.prototype, "status", void 0);
 __decorate([
     IsOptional(),
     IsEnum(Domain),
-    __metadata("design:type", typeof (_b = typeof Domain !== "undefined" && Domain) === "function" ? _b : Object)
+    __metadata("design:type", String)
 ], ListUsersDto.prototype, "domain", void 0);
 __decorate([
     IsOptional(),
     IsEnum(Role),
-    __metadata("design:type", typeof (_c = typeof Role !== "undefined" && Role) === "function" ? _c : Object)
+    __metadata("design:type", String)
 ], ListUsersDto.prototype, "role", void 0);
 //# sourceMappingURL=list-users.dto.js.map

@@ -5,23 +5,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module.js';
-import { MailModule } from './mail/mail.module.js';
-import { AuthModule } from './auth/auth.module.js';
-import { UsersModule } from './users/users.module.js';
-let AppModule = class AppModule {
+import { UsersService } from './users.service.js';
+import { UsersController } from './users.controller.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
+import { MailModule } from '../mail/mail.module.js';
+let UsersModule = class UsersModule {
 };
-AppModule = __decorate([
+UsersModule = __decorate([
     Module({
-        imports: [
-            ConfigModule.forRoot({ isGlobal: true }),
-            PrismaModule,
-            MailModule,
-            AuthModule,
-            UsersModule,
-        ],
+        imports: [PrismaModule, MailModule],
+        controllers: [UsersController],
+        providers: [UsersService],
+        exports: [UsersService],
     })
-], AppModule);
-export { AppModule };
-//# sourceMappingURL=app.module.js.map
+], UsersModule);
+export { UsersModule };
+//# sourceMappingURL=users.module.js.map

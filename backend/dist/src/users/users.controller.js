@@ -10,15 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, } from '@nestjs/common';
 import { UsersService } from './users.service.js';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ListUsersDto } from './dto/list-users.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { ListUsersDto } from './dto/list-users.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -38,7 +37,11 @@ let UsersController = class UsersController {
     }
     async update(id, dto) {
         const data = await this.usersService.update(id, dto);
-        return { success: true, data, message: 'Utilisateur mis a jour avec succes' };
+        return {
+            success: true,
+            data,
+            message: 'Utilisateur mis a jour avec succes',
+        };
     }
     async remove(id) {
         const data = await this.usersService.remove(id);
@@ -49,14 +52,14 @@ __decorate([
     Post(),
     __param(0, Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_a = typeof CreateUserDto !== "undefined" && CreateUserDto) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [CreateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "create", null);
 __decorate([
     Get(),
     __param(0, Query()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof ListUsersDto !== "undefined" && ListUsersDto) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [ListUsersDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([
@@ -71,7 +74,7 @@ __decorate([
     __param(0, Param('id')),
     __param(1, Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, typeof (_c = typeof UpdateUserDto !== "undefined" && UpdateUserDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [String, UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "update", null);
 __decorate([
@@ -84,7 +87,7 @@ __decorate([
 UsersController = __decorate([
     UseGuards(JwtAuthGuard, RolesGuard),
     Roles('ADMIN'),
-    Controller('api/v1/users'),
+    Controller('users'),
     __metadata("design:paramtypes", [UsersService])
 ], UsersController);
 export { UsersController };

@@ -7,9 +7,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b;
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, Matches, MinLength, } from 'class-validator';
-import { Domain, Role } from '@prisma/client';
+export var Domain;
+(function (Domain) {
+    Domain["TECHNIQUE"] = "TECHNIQUE";
+    Domain["COMMERCE"] = "COMMERCE";
+    Domain["MARKETING"] = "MARKETING";
+    Domain["FINANCE"] = "FINANCE";
+    Domain["RH"] = "RH";
+})(Domain || (Domain = {}));
+export var Role;
+(function (Role) {
+    Role["ADMIN"] = "ADMIN";
+    Role["USER"] = "USER";
+})(Role || (Role = {}));
 export class CreateUserDto {
     firstName;
     lastName;
@@ -43,18 +54,18 @@ __decorate([
     IsOptional(),
     IsEmail(),
     Matches(/^[^@]+@smodu\.ma$/, {
-        message: 'L\'email doit se terminer par @smodu.ma',
+        message: "L'email doit se terminer par @smodu.ma",
     }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
     IsEnum(Domain),
     IsNotEmpty(),
-    __metadata("design:type", typeof (_a = typeof Domain !== "undefined" && Domain) === "function" ? _a : Object)
+    __metadata("design:type", String)
 ], CreateUserDto.prototype, "domain", void 0);
 __decorate([
     IsOptional(),
     IsEnum(Role),
-    __metadata("design:type", typeof (_b = typeof Role !== "undefined" && Role) === "function" ? _b : Object)
+    __metadata("design:type", String)
 ], CreateUserDto.prototype, "role", void 0);
 //# sourceMappingURL=create-user.dto.js.map

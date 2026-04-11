@@ -7,9 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b;
 import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, Matches, MinLength, } from 'class-validator';
-import { Domain, Role } from '@prisma/client';
+import { Domain, Role } from './create-user.dto.js';
 export class UpdateUserDto {
     firstName;
     lastName;
@@ -45,19 +44,19 @@ __decorate([
     IsOptional(),
     IsEmail(),
     Matches(/^[^@]+@smodu\.ma$/, {
-        message: 'L\'email doit se terminer par @smodu.ma',
+        message: "L'email doit se terminer par @smodu.ma",
     }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "email", void 0);
 __decorate([
     IsOptional(),
     IsEnum(Domain),
-    __metadata("design:type", typeof (_a = typeof Domain !== "undefined" && Domain) === "function" ? _a : Object)
+    __metadata("design:type", String)
 ], UpdateUserDto.prototype, "domain", void 0);
 __decorate([
     IsOptional(),
     IsEnum(Role),
-    __metadata("design:type", typeof (_b = typeof Role !== "undefined" && Role) === "function" ? _b : Object)
+    __metadata("design:type", String)
 ], UpdateUserDto.prototype, "role", void 0);
 __decorate([
     IsOptional(),
