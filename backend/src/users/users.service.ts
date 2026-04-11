@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -11,7 +10,6 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { ListUsersDto } from './dto/list-users.dto.js';
 import * as bcrypt from 'bcrypt';
-import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +26,7 @@ export class UsersService {
     });
 
     if (existing) {
-      throw new ConflictException('Ce nom d\'utilisateur est deja utilise');
+      throw new ConflictException("Ce nom d'utilisateur est deja utilise");
     }
 
     if (dto.email) {
@@ -52,17 +50,24 @@ export class UsersService {
         email: dto.email ?? null,
         domain: dto.domain,
         role: dto.role ?? 'USER',
-        status: UserStatus.PENDING_CERTIFICATION,
+        status: 'PENDING_CERTIFICATION',
         isActive: true,
       },
     });
 
     if (user.email) {
       try {
-        await this.mailService.sendWelcomeEmail(user, plainPassword);
-      } catch (error) {
+        await this.mailService.sendWelcomeEmail({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          email: user.email,
+          plainPassword,
+        });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         this.logger.warn(
-          `Echec de l'envoi de l'email de bienvenue pour l'utilisateur ${user.username}: ${error.message}`,
+          `Echec de l'envoi de l'email de bienvenue pour l'utilisateur ${user.username}: ${message}`,
         );
       }
     } else {
@@ -71,7 +76,8 @@ export class UsersService {
       );
     }
 
-    const { password: _, ...result } = user;
+    const { password: _pw, ...result } = user;
+    void _pw;
     return result;
   }
 
@@ -153,7 +159,7 @@ export class UsersService {
         where: { username: dto.username, NOT: { id } },
       });
       if (conflict) {
-        throw new ConflictException('Ce nom d\'utilisateur est deja utilise');
+        throw new ConflictException("Ce nom d'utilisateur est deja utilise");
       }
     }
 

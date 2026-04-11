@@ -7,7 +7,7 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { Domain, Role } from '@prisma/client';
+import { Domain, Role } from './create-user.dto.js';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -30,7 +30,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEmail()
   @Matches(/^[^@]+@smodu\.ma$/, {
-    message: 'L\'email doit se terminer par @smodu.ma',
+    message: "L'email doit se terminer par @smodu.ma",
   })
   email?: string;
 

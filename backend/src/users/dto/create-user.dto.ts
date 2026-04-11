@@ -7,35 +7,47 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { Domain, Role } from '@prisma/client';
+
+export enum Domain {
+  TECHNIQUE = 'TECHNIQUE',
+  COMMERCE = 'COMMERCE',
+  MARKETING = 'MARKETING',
+  FINANCE = 'FINANCE',
+  RH = 'RH',
+}
+
+export enum Role {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName!: string;
 
   @IsString()
   @IsNotEmpty()
-  username: string;
+  username!: string;
 
   @IsString()
   @MinLength(8)
-  password: string;
+  password!: string;
 
   @IsOptional()
   @IsEmail()
   @Matches(/^[^@]+@smodu\.ma$/, {
-    message: 'L\'email doit se terminer par @smodu.ma',
+    message: "L'email doit se terminer par @smodu.ma",
   })
   email?: string;
 
   @IsEnum(Domain)
   @IsNotEmpty()
-  domain: Domain;
+  domain!: Domain;
 
   @IsOptional()
   @IsEnum(Role)

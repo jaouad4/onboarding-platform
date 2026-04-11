@@ -10,12 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service.js';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ListUsersDto } from './dto/list-users.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { ListUsersDto } from './dto/list-users.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
@@ -44,7 +44,11 @@ export class UsersController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     const data = await this.usersService.update(id, dto);
-    return { success: true, data, message: 'Utilisateur mis a jour avec succes' };
+    return {
+      success: true,
+      data,
+      message: 'Utilisateur mis a jour avec succes',
+    };
   }
 
   @Delete(':id')
