@@ -7,7 +7,7 @@ export enum VerificationDecision {
 
 export class VerifyCertificationDto {
   @IsEnum(VerificationDecision)
-  decision: VerificationDecision;
+  decision!: VerificationDecision;
 
   @IsOptional()
   @IsString()
