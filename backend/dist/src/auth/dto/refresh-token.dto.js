@@ -4,22 +4,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module.js';
-import { MailModule } from './mail/mail.module.js';
-import { AuthModule } from './auth/auth.module.js';
-let AppModule = class AppModule {
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-AppModule = __decorate([
-    Module({
-        imports: [
-            ConfigModule.forRoot({ isGlobal: true }),
-            PrismaModule,
-            MailModule,
-            AuthModule,
-        ],
-    })
-], AppModule);
-export { AppModule };
-//# sourceMappingURL=app.module.js.map
+import { IsNotEmpty, IsString } from 'class-validator';
+export class RefreshTokenDto {
+    refreshToken;
+}
+__decorate([
+    IsString(),
+    IsNotEmpty(),
+    __metadata("design:type", String)
+], RefreshTokenDto.prototype, "refreshToken", void 0);
+//# sourceMappingURL=refresh-token.dto.js.map

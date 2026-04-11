@@ -8,11 +8,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule,
-    JwtModule.register({}),
-  ],
+  imports: [PrismaModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],

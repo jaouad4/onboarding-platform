@@ -1,14 +1,30 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto.js';
-import { User } from '@prisma/client';
+
+export interface UserRecord {
+  id: string;
+  username: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  role: string;
+  domain: string | null;
+  status: string;
+  isActive: boolean;
+  firstLoginAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  password: string;
+}
+
+interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -21,10 +37,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { username: dto.identifier },
-          { email: dto.identifier },
-        ],
+        OR: [{ username: dto.identifier }, { email: dto.identifier }],
       },
     });
 
@@ -50,19 +63,19 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.generateTokens(user);
+    const tokens = this.generateTokens(user as UserRecord);
     return {
       success: true,
       data: {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
-        user: this.sanitizeUser(user),
+        user: this.sanitizeUser(user as UserRecord),
       },
       message: 'Connexion reussie.',
     };
   }
 
-  async refresh(userId: string, username: string) {
+  async refresh(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user || !user.isActive) {
@@ -71,7 +84,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.generateTokens(user);
+    const tokens = this.generateTokens(user as UserRecord);
     return {
       success: true,
       data: {
@@ -82,7 +95,7 @@ export class AuthService {
     };
   }
 
-  async logout() {
+  logout() {
     return {
       success: true,
       data: null,
@@ -90,7 +103,7 @@ export class AuthService {
     };
   }
 
-  async getMe(user: User) {
+  getMe(user: UserRecord) {
     return {
       success: true,
       data: this.sanitizeUser(user),
@@ -98,24 +111,24 @@ export class AuthService {
     };
   }
 
-  private async generateTokens(user: User) {
+  private generateTokens(user: UserRecord): TokenPair {
     const payload = { sub: user.id, username: user.username, role: user.role };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+      secret: this.configService.get<string>('JWT_SECRET') ?? '',
+      expiresIn: '15m',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET') ?? '',
+      expiresIn: '7d',
     });
 
     return { accessToken, refreshToken };
   }
 
-  private sanitizeUser(user: User) {
-    const { password, ...sanitized } = user;
+  private sanitizeUser(user: UserRecord): Omit<UserRecord, 'password'> {
+    const { password: _, ...sanitized } = user;
     return sanitized;
   }
 }
