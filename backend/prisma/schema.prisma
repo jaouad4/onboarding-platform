@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Domain {
+  TECHNIQUE
+  COMMERCE
+  MARKETING
+  FINANCE
+  RH
+}
+
+enum UserStatus {
+  PENDING_CERTIFICATION
+  CERTIFICATION_SUBMITTED
+  CERTIFICATION_VERIFIED
+  READY
+}
+
+enum PrimaryVerificationStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+enum AdminVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String?    @unique
+  username     String     @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role       @default(USER)
+  domain       Domain?
+  status       UserStatus @default(PENDING_CERTIFICATION)
+  isActive     Boolean    @default(true)
+  firstLoginAt DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  certificationSubmissions CertificationSubmission[]
+}
+
+model CertificationSubmission {
+  id                        String                    @id @default(uuid())
+  userId                    String
+  user                      User                      @relation(fields: [userId], references: [id])
+  pdfStoragePath            String
+  submittedAt               DateTime                  @default(now())
+  primaryVerificationStatus PrimaryVerificationStatus @default(PENDING)
+  primaryVerificationNote   String?
+  adminVerificationStatus   AdminVerificationStatus   @default(PENDING)
+  adminVerificationNote     String?
+  verifiedAt                DateTime?
+  verifiedBy                String?
+}
