@@ -79,7 +79,7 @@ export class CertificationsService {
 
       await this.prisma.user.update({
         where: { id: userId },
-        data: { status: 'CERTIFICATIONSUBMITTED' },
+        data: { status: 'CERTIFICATION_SUBMITTED' },
       });
 
       return {
@@ -221,7 +221,7 @@ export class CertificationsService {
 
       await this.prisma.user.update({
         where: { id: submission.userId },
-        data: { status: 'CERTIFICATIONVERIFIED' },
+        data: { status: 'CERTIFICATION_VERIFIED' },
       });
 
       return { message: 'Certification approuvee. Le domaine de l\'utilisateur est maintenant visible' };
@@ -238,7 +238,7 @@ export class CertificationsService {
 
       await this.prisma.user.update({
         where: { id: submission.userId },
-        data: { status: 'PENDINGCERTIFICATION' },
+        data: { status: 'PENDING_CERTIFICATION' },
       });
 
       return { message: 'Certification rejetee. L\'utilisateur peut re-soumettre son certificat' };

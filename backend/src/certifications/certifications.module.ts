@@ -3,22 +3,18 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { mkdirSync } from 'fs';
-import { Request } from 'express';
 import { CertificationsController } from './certifications.controller.js';
 import { CertificationsService } from './certifications.service.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
-
-interface AuthenticatedRequest extends Request {
-  user?: { userId: string };
-}
 
 @Module({
   imports: [
     PrismaModule,
     MulterModule.register({
       storage: diskStorage({
-        destination: (req: AuthenticatedRequest, file, cb) => {
-          const userId = req.user?.userId ?? 'unknown';
+        destination: (req, file, cb) => {
+          const user = req.user as { userId?: string } | undefined;
+          const userId = user?.userId ?? 'unknown';
           const uploadPath = join(
             process.cwd(),
             'uploads',
