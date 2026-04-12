@@ -1,59 +1,81 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getMe, logout, UserProfile } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getMe()
-      .then((profile) => {
-        if (profile.role !== "USER") {
-          router.replace("/admin/dashboard");
-          return;
-        }
-        setUser(profile);
-      })
-      .catch(() => {
-        router.replace("/login");
-      })
-      .finally(() => setLoading(false));
-  }, [router]);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <p className="text-sm text-zinc-500">Chargement...</p>
-      </div>
+async function getMe(token: string) {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/v1/auth/me`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      }
     );
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  if (!token) {
+    redirect("/login");
   }
 
-  if (!user) return null;
+  const user = await getMe(token);
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="h-14 bg-white border-b border-zinc-200 flex items-center justify-between px-6">
-        <span className="font-semibold text-zinc-900">SMODU</span>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-zinc-600">
-            {user.firstName} {user.lastName}
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b border-border bg-card px-6 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <span className="text-base font-semibold tracking-tight">
+            SMODU Platform
           </span>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            Deconnexion
-          </Button>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              {user.firstName} {user.lastName}
+            </span>
+            <form action="/api/auth/logout" method="POST">
+              <Button type="submit" variant="outline" size="sm">
+                Se deconnecter
+              </Button>
+            </form>
+          </div>
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-6 py-8">{children}</main>
+      <div className="flex flex-1">
+        <aside className="w-56 border-r border-border bg-card px-4 py-6">
+          <nav className="space-y-1">
+            <Link
+              href="/dashboard"
+              className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Mon parcours
+            </Link>
+          </nav>
+        </aside>
+        <main className="flex-1 px-8 py-6">
+          <div className="mx-auto max-w-3xl">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }
