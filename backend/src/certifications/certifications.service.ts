@@ -5,12 +5,23 @@ import {
   NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { VerifyCertificationDto, VerificationDecision } from './dto/verify-certification.dto.js';
 import { join } from 'path';
-import { createReadStream, existsSync } from 'fs';
+import { createReadStream, existsSync, readFileSync } from 'fs';
+import { PrismaService } from '../prisma/prisma.service.js';
+import {
+  VerificationDecision,
+  VerifyCertificationDto,
+} from './dto/verify-certification.dto.js';
 
-const pdfParse = require('pdf-parse');
+interface PdfParseResult {
+  text: string;
+}
+
+async function parsePdf(dataBuffer: Buffer): Promise<PdfParseResult> {
+  const mod = await import('pdf-parse');
+  const parse = mod as unknown as (buf: Buffer) => Promise<PdfParseResult>;
+  return parse(dataBuffer);
+}
 
 @Injectable()
 export class CertificationsService {
@@ -25,12 +36,12 @@ export class CertificationsService {
     filePath: string,
   ): Promise<{ primaryVerificationStatus: string; message: string }> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
 
     if (!user.firstLoginAt) {
-      throw new ForbiddenException(
-        'Aucune date de premier login enregistree',
-      );
+      throw new ForbiddenException('Aucune date de premier login enregistree');
     }
 
     const msElapsed = Date.now() - user.firstLoginAt.getTime();
@@ -58,14 +69,13 @@ export class CertificationsService {
     }
 
     const fullPath = join(process.cwd(), filePath);
-    const dataBuffer = require('fs').readFileSync(fullPath);
-    const pdfData = await pdfParse(dataBuffer);
-    const pdfText = this.removeDiacritics(pdfData.text.toLowerCase());
+    const dataBuffer: Buffer = readFileSync(fullPath);
+    const pdfData: PdfParseResult = await parsePdf(dataBuffer);
+    const pdfText: string = this.removeDiacritics(pdfData.text.toLowerCase());
 
     const firstName = this.removeDiacritics(user.firstName.toLowerCase());
     const lastName = this.removeDiacritics(user.lastName.toLowerCase());
-    const nameFound =
-      pdfText.includes(firstName) && pdfText.includes(lastName);
+    const nameFound = pdfText.includes(firstName) && pdfText.includes(lastName);
 
     if (nameFound) {
       await this.prisma.certificationSubmission.create({
@@ -87,24 +97,24 @@ export class CertificationsService {
         message:
           'Votre certificat a ete soumis avec succes et est en cours de verification par un administrateur',
       };
-    } else {
-      await this.prisma.certificationSubmission.create({
-        data: {
-          userId,
-          pdfStoragePath: filePath,
-          primaryVerificationStatus: 'FAILED',
-          adminVerificationStatus: 'PENDING',
-          primaryVerificationNote:
-            'Le nom complet de l\'utilisateur n\'a pas ete trouve dans le certificat',
-        },
-      });
-
-      return {
-        primaryVerificationStatus: 'FAILED',
-        message:
-          'Le nom sur le certificat ne correspond pas a votre nom enregistre. Veuillez soumettre le bon certificat',
-      };
     }
+
+    await this.prisma.certificationSubmission.create({
+      data: {
+        userId,
+        pdfStoragePath: filePath,
+        primaryVerificationStatus: 'FAILED',
+        adminVerificationStatus: 'PENDING',
+        primaryVerificationNote:
+          "Le nom complet de l'utilisateur n'a pas ete trouve dans le certificat",
+      },
+    });
+
+    return {
+      primaryVerificationStatus: 'FAILED',
+      message:
+        'Le nom sur le certificat ne correspond pas a votre nom enregistre. Veuillez soumettre le bon certificat',
+    };
   }
 
   async getMyStatus(userId: string) {
@@ -116,7 +126,9 @@ export class CertificationsService {
         firstLoginAt: true,
       },
     });
-    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
 
     const latestSubmission =
       await this.prisma.certificationSubmission.findFirst({
@@ -131,10 +143,10 @@ export class CertificationsService {
         },
       });
 
-    let timerInfo: {
-      timerElapsed: boolean;
-      remainingMs: number | null;
-    } = { timerElapsed: true, remainingMs: null };
+    let timerInfo: { timerElapsed: boolean; remainingMs: number | null } = {
+      timerElapsed: true,
+      remainingMs: null,
+    };
 
     if (user.firstLoginAt) {
       const msElapsed = Date.now() - user.firstLoginAt.getTime();
@@ -180,7 +192,9 @@ export class CertificationsService {
     const submission = await this.prisma.certificationSubmission.findUnique({
       where: { id: submissionId },
     });
-    if (!submission) throw new NotFoundException('Soumission introuvable');
+    if (!submission) {
+      throw new NotFoundException('Soumission introuvable');
+    }
 
     const fullPath = join(process.cwd(), submission.pdfStoragePath);
     if (!existsSync(fullPath)) {
@@ -203,7 +217,9 @@ export class CertificationsService {
       where: { id: submissionId },
       include: { user: true },
     });
-    if (!submission) throw new NotFoundException('Soumission introuvable');
+    if (!submission) {
+      throw new NotFoundException('Soumission introuvable');
+    }
     if (submission.adminVerificationStatus !== 'PENDING') {
       throw new BadRequestException('Cette soumission a deja ete traitee');
     }
@@ -224,24 +240,30 @@ export class CertificationsService {
         data: { status: 'CERTIFICATION_VERIFIED' },
       });
 
-      return { message: 'Certification approuvee. Le domaine de l\'utilisateur est maintenant visible' };
-    } else {
-      await this.prisma.certificationSubmission.update({
-        where: { id: submissionId },
-        data: {
-          adminVerificationStatus: 'REJECTED',
-          adminVerificationNote: dto.note ?? null,
-          verifiedAt: new Date(),
-          verifiedBy: adminUsername,
-        },
-      });
-
-      await this.prisma.user.update({
-        where: { id: submission.userId },
-        data: { status: 'PENDING_CERTIFICATION' },
-      });
-
-      return { message: 'Certification rejetee. L\'utilisateur peut re-soumettre son certificat' };
+      return {
+        message:
+          "Certification approuvee. Le domaine de l'utilisateur est maintenant visible",
+      };
     }
+
+    await this.prisma.certificationSubmission.update({
+      where: { id: submissionId },
+      data: {
+        adminVerificationStatus: 'REJECTED',
+        adminVerificationNote: dto.note ?? null,
+        verifiedAt: new Date(),
+        verifiedBy: adminUsername,
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: submission.userId },
+      data: { status: 'PENDING_CERTIFICATION' },
+    });
+
+    return {
+      message:
+        "Certification rejetee. L'utilisateur peut re-soumettre son certificat",
+    };
   }
 }

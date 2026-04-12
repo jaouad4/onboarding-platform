@@ -69,7 +69,6 @@ export class MailService {
         `Email de bienvenue envoye a ${email} — MessageId: ${info.messageId}`,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const previewUrl = nodemailer.getTestMessageUrl(info as never);
       if (previewUrl) {
         this.logger.log(`Preview Ethereal : ${previewUrl}`);
