@@ -4,6 +4,10 @@ import Cookies from "js-cookie";
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
+const isSecure = typeof window !== "undefined"
+  ? window.location.protocol === "https:"
+  : false;
+
 const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -79,8 +83,8 @@ apiClient.interceptors.response.use(
         const newAccessToken = refreshResponse.data.data.accessToken;
         const newRefreshToken = refreshResponse.data.data.refreshToken;
 
-        Cookies.set(ACCESS_TOKEN_KEY, newAccessToken, { secure: true, sameSite: "strict" });
-        Cookies.set(REFRESH_TOKEN_KEY, newRefreshToken, { secure: true, sameSite: "strict" });
+        Cookies.set(ACCESS_TOKEN_KEY, newAccessToken, { secure: isSecure, sameSite: "strict" });
+        Cookies.set(REFRESH_TOKEN_KEY, newRefreshToken, { secure: isSecure, sameSite: "strict" });
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
@@ -103,8 +107,8 @@ apiClient.interceptors.response.use(
 );
 
 export const setTokens = (accessToken: string, refreshToken: string) => {
-  Cookies.set(ACCESS_TOKEN_KEY, accessToken, { secure: true, sameSite: "strict" });
-  Cookies.set(REFRESH_TOKEN_KEY, refreshToken, { secure: true, sameSite: "strict" });
+  Cookies.set(ACCESS_TOKEN_KEY, accessToken, { secure: isSecure, sameSite: "strict" });
+  Cookies.set(REFRESH_TOKEN_KEY, refreshToken, { secure: isSecure, sameSite: "strict" });
 };
 
 export const clearTokens = () => {

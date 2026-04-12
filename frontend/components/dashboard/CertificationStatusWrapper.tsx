@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CertificationStatus } from "./CertificationStatus";
+import dynamic from "next/dynamic";
+
+const CertificationStatus = dynamic(
+  () =>
+    import("./CertificationStatus").then((m) => m.CertificationStatus),
+  { ssr: false }
+);
 
 type UserStatus =
   | "PENDING_CERTIFICATION"

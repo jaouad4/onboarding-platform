@@ -49,11 +49,9 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  // firstLoginAt vient de /my-status, pas de /auth/me
   const firstLoginAt: string | null = certStatus?.firstLoginAt ?? null;
 
   if (!firstLoginAt) {
-    // Le user n'a jamais eu de firstLoginAt enregistre
     return (
       <div className="space-y-6">
         <div>
