@@ -1,4 +1,4 @@
-import apiClient, { setTokens, clearTokens } from "./api";
+import apiClient from "./api";
 
 export interface UserProfile {
   id: string;
@@ -8,15 +8,17 @@ export interface UserProfile {
   lastName: string;
   role: "ADMIN" | "USER";
   domain: "TECHNIQUE" | "COMMERCE" | "MARKETING" | "FINANCE" | "RH" | null;
-  status: "PENDINGCERTIFICATION" | "CERTIFICATIONSUBMITTED" | "CERTIFICATIONVERIFIED" | "READY";
+  status:
+    | "PENDING_CERTIFICATION"
+    | "CERTIFICATION_SUBMITTED"
+    | "CERTIFICATION_VERIFIED"
+    | "READY";
   firstLoginAt: string | null;
   isActive: boolean;
   createdAt: string;
 }
 
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
   user: UserProfile;
 }
 
@@ -24,20 +26,26 @@ export const login = async (
   identifier: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await apiClient.post<{ success: boolean; data: LoginResponse }>(
-    "/auth/login",
-    { identifier, password }
-  );
-  const { accessToken, refreshToken, user } = response.data.data;
-  setTokens(accessToken, refreshToken);
-  return { accessToken, refreshToken, user };
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier, password }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json() as { message?: string };
+    throw { response: { data: { message: err.message } } };
+  }
+
+  const data = await response.json() as { success: boolean; data: LoginResponse };
+  return data.data;
 };
 
 export const logout = async (): Promise<void> => {
   try {
     await apiClient.post("/auth/logout");
   } finally {
-    clearTokens();
+    await fetch("/api/auth/logout", { method: "POST" });
   }
 };
 

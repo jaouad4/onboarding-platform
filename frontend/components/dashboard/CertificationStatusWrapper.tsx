@@ -1,11 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 const CertificationStatus = dynamic(
-  () =>
-    import("./CertificationStatus").then((m) => m.CertificationStatus),
+  () => import("./CertificationStatus").then((m) => m.CertificationStatus),
   { ssr: false }
 );
 
@@ -26,13 +24,11 @@ export function CertificationStatusWrapper({
   firstLoginAt,
   domain,
 }: Props) {
-  const router = useRouter();
   return (
     <CertificationStatus
       status={status}
       firstLoginAt={firstLoginAt}
       domain={domain}
-      onRefresh={() => router.refresh()}
     />
   );
 }

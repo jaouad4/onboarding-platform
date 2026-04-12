@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Timer } from "./Timer";
 import { UploadCertificat } from "./UploadCertificat";
 import { isTimerElapsed } from "@/lib/certification";
@@ -22,15 +23,14 @@ interface CertificationStatusProps {
   status: UserStatus;
   firstLoginAt: string;
   domain: string | null;
-  onRefresh: () => void;
 }
 
 export function CertificationStatus({
   status,
   firstLoginAt,
   domain,
-  onRefresh,
 }: CertificationStatusProps) {
+  const router = useRouter();
   const timerElapsed = isTimerElapsed(firstLoginAt);
 
   if (status === "PENDING_CERTIFICATION") {
@@ -53,7 +53,7 @@ export function CertificationStatus({
         </div>
 
         {!timerElapsed ? (
-          <Timer firstLoginAt={firstLoginAt} onElapsed={onRefresh} />
+          <Timer firstLoginAt={firstLoginAt} onElapsed={() => router.refresh()} />
         ) : (
           <div className="rounded-lg border border-border bg-card p-6">
             <h3 className="text-base font-semibold">
@@ -63,7 +63,7 @@ export function CertificationStatus({
               Vous pouvez maintenant deposer votre certificat PDF. Assurez-vous
               que votre nom complet y est bien visible.
             </p>
-            <UploadCertificat onSuccess={onRefresh} />
+            <UploadCertificat onSuccess={() => router.refresh()} />
           </div>
         )}
       </div>
