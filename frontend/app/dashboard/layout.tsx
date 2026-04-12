@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 async function getMe(token: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/v1/auth/me`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/auth/me`,
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",

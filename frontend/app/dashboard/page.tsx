@@ -5,7 +5,7 @@ import { CertificationStatusWrapper } from "@/components/dashboard/Certification
 async function getCertificationStatus(token: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/v1/certifications/my-status`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/certifications/my-status`,
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
@@ -22,7 +22,7 @@ async function getCertificationStatus(token: string) {
 async function getMe(token: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/v1/auth/me`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/auth/me`,
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  const firstLoginAt: string | null = certStatus?.firstLoginAt ?? null;
+  const firstLoginAt: string | null = user?.firstLoginAt ?? user?.firstLoginAt ?? certStatus?.firstLoginAt ?? null;
 
   if (!firstLoginAt) {
     return (
