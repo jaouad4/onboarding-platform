@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { CertificationStatus } from "@/components/dashboard/CertificationStatus";
+import { CertificationStatusWrapper } from "@/components/dashboard/CertificationStatusWrapper";
 
 async function getCertificationStatus(token: string) {
   try {
@@ -56,14 +56,13 @@ export default async function DashboardPage() {
           Bonjour, {user.firstName}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Suivez votre progression d'integration ci-dessous.
+            Suivez votre progression d&apos;integration ci-dessous.
         </p>
       </div>
-      <CertificationStatus
-        status={user.status}
-        firstLoginAt={user.firstLoginAt}
-        domain={certStatus?.domain ?? user.domain ?? null}
-        onRefresh={() => {}}
+      <CertificationStatusWrapper
+      status={user.status}
+      firstLoginAt={user.firstLoginAt}
+      domain={certStatus?.domain ?? user.domain ?? null}
       />
     </div>
   );

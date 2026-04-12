@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { apiClient } from "@/lib/api";
+import apiClient from "@/lib/api";
+import type { AxiosProgressEvent } from "axios";
 
 interface UploadCertificatProps {
   onSuccess: () => void;
@@ -33,60 +34,61 @@ export function UploadCertificat({ onSuccess }: UploadCertificatProps) {
   }
 
   async function handleUpload(file: File) {
-    const error = validateFile(file);
-    if (error) {
-      setUploadState({ status: "error", message: error });
-      return;
-    }
-
-    setUploadState({ status: "uploading", progress: 0 });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await apiClient.post<{
-        success: boolean;
-        data: {
-          primaryVerificationStatus: "PASSED" | "FAILED";
-          primaryVerificationNote: string | null;
-        };
-        message: string;
-      }>("/certifications/submit", formData, {
-        onUploadProgress: (progressEvent: ProgressEvent) => {
-          if (progressEvent.lengthComputable) {
-            const progress = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100
-            );
-            setUploadState({ status: "uploading", progress });
-          }
-        },
-      });
-
-      if (
-        response.success &&
-        response.data.primaryVerificationStatus === "PASSED"
-      ) {
-        setUploadState({
-          status: "success",
-          message:
-            "Votre certificat a ete soumis avec succes. Il est en attente de verification par un administrateur.",
-        });
-        onSuccess();
-      } else {
-        const note =
-          response.data.primaryVerificationNote ||
-          "Le nom sur le certificat ne correspond pas a votre profil. Verifiez que votre nom complet est bien visible dans le document.";
-        setUploadState({ status: "error", message: note });
-      }
-    } catch {
-      setUploadState({
-        status: "error",
-        message:
-          "Une erreur est survenue lors de l'envoi. Verifiez votre connexion et reessayez.",
-      });
-    }
+  const validationError = validateFile(file);
+  if (validationError) {
+    setUploadState({ status: "error", message: validationError });
+    return;
   }
+
+  setUploadState({ status: "uploading", progress: 0 });
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const axiosResponse = await apiClient.post<{
+      success: boolean;
+      data: {
+        primaryVerificationStatus: "PASSED" | "FAILED";
+        primaryVerificationNote: string | null;
+      };
+      message: string;
+    }>("/certifications/submit", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+          setUploadState({ status: "uploading", progress });
+        }
+      },
+    });
+
+    // axiosResponse.data est le corps JSON retourne par le backend
+    const body = axiosResponse.data;
+
+    if (body.success && body.data.primaryVerificationStatus === "PASSED") {
+      setUploadState({
+        status: "success",
+        message:
+          "Votre certificat a ete soumis avec succes. Il est en attente de verification par un administrateur.",
+      });
+      onSuccess();
+    } else {
+      const note =
+        body.data.primaryVerificationNote ||
+        "Le nom sur le certificat ne correspond pas a votre profil. Verifiez que votre nom complet est bien visible dans le document.";
+      setUploadState({ status: "error", message: note });
+    }
+  } catch {
+    setUploadState({
+      status: "error",
+      message:
+        "Une erreur est survenue lors de l'envoi. Verifiez votre connexion et reessayez.",
+    });
+  }
+}
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();

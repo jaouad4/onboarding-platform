@@ -16,13 +16,19 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CertificationsService } from './certifications.service.js';
 import { VerifyCertificationDto } from './dto/verify-certification.dto.js';
 
-interface JwtPayload {
-  userId: string;
+interface AuthenticatedUser {
+  id: string;
   username: string;
   role: string;
 }
 
-@Controller('api/v1/certifications')
+interface SubmitResult {
+  primaryVerificationStatus: string;
+  primaryVerificationNote: string | null;
+  message: string;
+}
+
+@Controller('certifications')
 @UseGuards(JwtAuthGuard)
 export class CertificationsController {
   constructor(private readonly certificationsService: CertificationsService) {}
@@ -31,7 +37,7 @@ export class CertificationsController {
   @UseInterceptors(FileInterceptor('file'))
   async submit(
     @UploadedFile() file: Express.Multer.File,
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     if (!file) {
       return { success: false, message: 'Aucun fichier fourni', data: null };
@@ -41,21 +47,25 @@ export class CertificationsController {
       .replace(process.cwd() + '/', '')
       .replace(process.cwd() + '\\', '');
 
-    const result = await this.certificationsService.submitCertification(
-      user.userId,
-      relativePath,
-    );
+    const result: SubmitResult =
+      await this.certificationsService.submitCertification(
+        user.id,
+        relativePath,
+      );
 
     return {
       success: result.primaryVerificationStatus === 'PASSED',
       message: result.message,
-      data: { primaryVerificationStatus: result.primaryVerificationStatus },
+      data: {
+        primaryVerificationStatus: result.primaryVerificationStatus,
+        primaryVerificationNote: result.primaryVerificationNote,
+      },
     };
   }
 
   @Get('my-status')
-  async getMyStatus(@CurrentUser() user: JwtPayload) {
-    const data = await this.certificationsService.getMyStatus(user.userId);
+  async getMyStatus(@CurrentUser() user: AuthenticatedUser) {
+    const data: unknown = await this.certificationsService.getMyStatus(user.id);
     return { success: true, data, message: null };
   }
 
@@ -63,7 +73,8 @@ export class CertificationsController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   async getPending() {
-    const data = await this.certificationsService.getPendingSubmissions();
+    const data: unknown =
+      await this.certificationsService.getPendingSubmissions();
     return { success: true, data, message: null };
   }
 
@@ -80,7 +91,7 @@ export class CertificationsController {
   async verify(
     @Param('id') id: string,
     @Body() dto: VerifyCertificationDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     const result: { message: string } =
       await this.certificationsService.verifySubmission(id, dto, user.username);

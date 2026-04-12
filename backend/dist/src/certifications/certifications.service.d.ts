@@ -1,14 +1,16 @@
 import { StreamableFile } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { VerifyCertificationDto } from './dto/verify-certification.dto.js';
+interface SubmitResult {
+    primaryVerificationStatus: string;
+    primaryVerificationNote: string | null;
+    message: string;
+}
 export declare class CertificationsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     private removeDiacritics;
-    submitCertification(userId: string, filePath: string): Promise<{
-        primaryVerificationStatus: string;
-        message: string;
-    }>;
+    submitCertification(userId: string, filePath: string): Promise<SubmitResult>;
     getMyStatus(userId: string): Promise<{
         status: import("../generated/prisma/enums.js").UserStatus;
         domain: import("../generated/prisma/enums.js").Domain | null;
@@ -49,3 +51,4 @@ export declare class CertificationsService {
         message: string;
     }>;
 }
+export {};

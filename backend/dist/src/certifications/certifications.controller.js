@@ -30,15 +30,18 @@ let CertificationsController = class CertificationsController {
         const relativePath = file.path
             .replace(process.cwd() + '/', '')
             .replace(process.cwd() + '\\', '');
-        const result = await this.certificationsService.submitCertification(user.userId, relativePath);
+        const result = await this.certificationsService.submitCertification(user.id, relativePath);
         return {
             success: result.primaryVerificationStatus === 'PASSED',
             message: result.message,
-            data: { primaryVerificationStatus: result.primaryVerificationStatus },
+            data: {
+                primaryVerificationStatus: result.primaryVerificationStatus,
+                primaryVerificationNote: result.primaryVerificationNote,
+            },
         };
     }
     async getMyStatus(user) {
-        const data = await this.certificationsService.getMyStatus(user.userId);
+        const data = await this.certificationsService.getMyStatus(user.id);
         return { success: true, data, message: null };
     }
     async getPending() {
@@ -98,7 +101,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CertificationsController.prototype, "verify", null);
 CertificationsController = __decorate([
-    Controller('api/v1/certifications'),
+    Controller('certifications'),
     UseGuards(JwtAuthGuard),
     __metadata("design:paramtypes", [CertificationsService])
 ], CertificationsController);

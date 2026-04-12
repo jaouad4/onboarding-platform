@@ -73,6 +73,7 @@ let CertificationsService = class CertificationsService {
             });
             return {
                 primaryVerificationStatus: 'PASSED',
+                primaryVerificationNote: null,
                 message: 'Votre certificat a ete soumis avec succes et est en cours de verification par un administrateur',
             };
         }
@@ -87,6 +88,7 @@ let CertificationsService = class CertificationsService {
         });
         return {
             primaryVerificationStatus: 'FAILED',
+            primaryVerificationNote: "Le nom complet de l'utilisateur n'a pas ete trouve dans le certificat",
             message: 'Le nom sur le certificat ne correspond pas a votre nom enregistre. Veuillez soumettre le bon certificat',
         };
     }
