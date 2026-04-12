@@ -49,6 +49,26 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // firstLoginAt vient de /my-status, pas de /auth/me
+  const firstLoginAt: string | null = certStatus?.firstLoginAt ?? null;
+
+  if (!firstLoginAt) {
+    // Le user n'a jamais eu de firstLoginAt enregistre
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Bonjour, {user.firstName}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Votre compte est en cours de configuration. Reconnectez-vous dans
+            quelques instants.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -56,13 +76,13 @@ export default async function DashboardPage() {
           Bonjour, {user.firstName}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-            Suivez votre progression d&apos;integration ci-dessous.
+          Suivez votre progression d&apos;integration ci-dessous.
         </p>
       </div>
       <CertificationStatusWrapper
-      status={user.status}
-      firstLoginAt={user.firstLoginAt}
-      domain={certStatus?.domain ?? user.domain ?? null}
+        status={user.status}
+        firstLoginAt={firstLoginAt}
+        domain={certStatus?.domain ?? user.domain ?? null}
       />
     </div>
   );
