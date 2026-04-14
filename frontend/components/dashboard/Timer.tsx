@@ -30,7 +30,8 @@ export function Timer({ firstLoginAt, onElapsed }: TimerProps) {
       const days = Math.floor(total / (1000 * 60 * 60 * 24));
       const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
-      setRemaining({ days, hours, minutes, total });
+      const seconds = Math.floor((total % (1000 * 60)) / 1000);
+      setRemaining({ days, hours, minutes, seconds, total });
 
       if (total === 0 && !calledRef.current) {
         calledRef.current = true;
@@ -39,7 +40,8 @@ export function Timer({ firstLoginAt, onElapsed }: TimerProps) {
       }
     };
 
-    const interval = setInterval(tick, 60000);
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstLoginAt]);
@@ -51,30 +53,33 @@ export function Timer({ firstLoginAt, onElapsed }: TimerProps) {
       <p className="mb-1 text-sm font-medium text-muted-foreground">
         Temps restant avant de pouvoir soumettre votre certificat
       </p>
-      <div className="mt-3 flex gap-6 text-center">
+      <div className="mt-3 flex gap-4 text-center">
         <div className="flex flex-col">
           <span className="text-3xl font-bold tabular-nums">
             {String(remaining.days).padStart(2, "0")}
           </span>
           <span className="text-xs text-muted-foreground">jours</span>
         </div>
-        <div className="flex items-center text-2xl font-bold text-muted-foreground">
-          :
-        </div>
+        <div className="flex items-center text-2xl font-bold text-muted-foreground">:</div>
         <div className="flex flex-col">
           <span className="text-3xl font-bold tabular-nums">
             {String(remaining.hours).padStart(2, "0")}
           </span>
           <span className="text-xs text-muted-foreground">heures</span>
         </div>
-        <div className="flex items-center text-2xl font-bold text-muted-foreground">
-          :
-        </div>
+        <div className="flex items-center text-2xl font-bold text-muted-foreground">:</div>
         <div className="flex flex-col">
           <span className="text-3xl font-bold tabular-nums">
             {String(remaining.minutes).padStart(2, "0")}
           </span>
           <span className="text-xs text-muted-foreground">minutes</span>
+        </div>
+        <div className="flex items-center text-2xl font-bold text-muted-foreground">:</div>
+        <div className="flex flex-col">
+          <span className="text-3xl font-bold tabular-nums">
+            {String(remaining.seconds ?? 0).padStart(2, "0")}
+          </span>
+          <span className="text-xs text-muted-foreground">secondes</span>
         </div>
       </div>
     </div>

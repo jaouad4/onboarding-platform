@@ -43,7 +43,7 @@ export function CertificationStatus({
             certification Odoo via la plateforme officielle.
           </p>
           <a
-            href="https://www.odoo.com/slides/all-slides"
+            href="https://www.odoo.com/fr_FR/slides/odoo-certification-sample-test-50"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"

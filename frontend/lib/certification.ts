@@ -20,5 +20,5 @@ export function formatTimeRemaining(targetDate: Date): {
   const days = Math.floor(total / (1000 * 60 * 60 * 24));
   const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
-  return { days, hours, minutes, total };
+  return { days, hours, minutes, seconds: Math.floor((total % (1000 * 60)) / 1000), total };
 }
