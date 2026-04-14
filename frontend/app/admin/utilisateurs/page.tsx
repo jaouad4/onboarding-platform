@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { apiClient } from "@/lib/api-client"
+import { apiClient } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -20,11 +20,14 @@ interface User {
   createdAt: string
 }
 
-interface PaginatedUsers {
-  items: User[]
-  total: number
-  page: number
-  perPage: number
+interface PaginatedResponse {
+  data: User[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -55,26 +58,25 @@ export default function AdminUtilisateursPage() {
   const perPage = 10
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        perPage: perPage.toString(),
-      })
-      if (statusFilter !== "ALL") params.set("status", statusFilter)
-      if (domainFilter !== "ALL") params.set("domain", domainFilter)
+  setLoading(true)
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: perPage.toString(),   // le backend attend "limit" pas "perPage"
+    })
+    if (statusFilter !== "ALL") params.set("status", statusFilter)
+    if (domainFilter !== "ALL") params.set("domain", domainFilter)
 
-      const res = await apiClient(`/users?${params.toString()}`)
-      const data = await res.json() as { success: boolean; data: PaginatedUsers }
-      
-      if (data.success) {
-        setUsers(data.data.items)
-        setTotal(data.data.total)
-      }
-    } finally {
-      setLoading(false)
+    const res = await apiClient.get(`/users?${params.toString()}`)
+    const json = res.data
+    if (json.success) {
+      setUsers(json.data.data)
+      setTotal(json.data.meta.total)
     }
-  }, [page, statusFilter, domainFilter])
+  } finally {
+    setLoading(false)
+  }
+}, [page, statusFilter, domainFilter])
 
   useEffect(() => {
     fetchUsers()
