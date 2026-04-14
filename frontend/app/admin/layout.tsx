@@ -1,59 +1,13 @@
-"use client";
+import { ReactNode } from "react"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getMe, logout, UserProfile } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getMe()
-      .then((profile) => {
-        if (profile.role !== "ADMIN") {
-          router.replace("/login");
-          return;
-        }
-        setUser(profile);
-      })
-      .catch(() => {
-        router.replace("/login");
-      })
-      .finally(() => setLoading(false));
-  }, [router]);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <p className="text-sm text-zinc-500">Chargement...</p>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="h-14 bg-white border-b border-zinc-200 flex items-center justify-between px-6">
-        <span className="font-semibold text-zinc-900">SMODU — Administration</span>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-zinc-600">
-            {user.firstName} {user.lastName}
-          </span>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            Deconnexion
-          </Button>
-        </div>
-      </header>
-      <main className="max-w-6xl mx-auto px-6 py-8">{children}</main>
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebar />
+      <main className="flex-1 p-8">
+        {children}
+      </main>
     </div>
-  );
+  )
 }

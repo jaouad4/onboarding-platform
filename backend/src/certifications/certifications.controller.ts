@@ -97,4 +97,11 @@ export class CertificationsController {
       await this.certificationsService.verifySubmission(id, dto, user.username);
     return { success: true, data: result, message: result.message };
   }
+
+  @Get('history')
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  async getHistory() {
+    return this.certificationsService.getHistory();
+  }
 }
