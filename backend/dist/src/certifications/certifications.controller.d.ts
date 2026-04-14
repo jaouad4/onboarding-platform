@@ -38,5 +38,29 @@ export declare class CertificationsController {
         };
         message: string;
     }>;
+    getHistory(): Promise<{
+        success: boolean;
+        data: ({
+            user: {
+                id: string;
+                username: string;
+                firstName: string;
+                lastName: string;
+                domain: import("../generated/prisma/enums.js").Domain | null;
+            };
+        } & {
+            id: string;
+            userId: string;
+            pdfStoragePath: string;
+            submittedAt: Date;
+            primaryVerificationStatus: import("../generated/prisma/enums.js").PrimaryVerificationStatus;
+            primaryVerificationNote: string | null;
+            adminVerificationStatus: import("../generated/prisma/enums.js").AdminVerificationStatus;
+            adminVerificationNote: string | null;
+            verifiedAt: Date | null;
+            verifiedBy: string | null;
+        })[];
+        message: string;
+    }>;
 }
 export {};

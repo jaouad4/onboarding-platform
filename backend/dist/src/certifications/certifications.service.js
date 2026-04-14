@@ -219,6 +219,32 @@ let CertificationsService = class CertificationsService {
             message: "Certification rejetee. L'utilisateur peut re-soumettre son certificat",
         };
     }
+    async getHistory() {
+        const submissions = await this.prisma.certificationSubmission.findMany({
+            where: {
+                adminVerificationStatus: {
+                    in: ['APPROVED', 'REJECTED'],
+                },
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
+                        domain: true,
+                    },
+                },
+            },
+            orderBy: { verifiedAt: 'desc' },
+        });
+        return {
+            success: true,
+            data: submissions,
+            message: 'Historique des certifications',
+        };
+    }
 };
 CertificationsService = __decorate([
     Injectable(),

@@ -55,6 +55,9 @@ let CertificationsController = class CertificationsController {
         const result = await this.certificationsService.verifySubmission(id, dto, user.username);
         return { success: true, data: result, message: result.message };
     }
+    async getHistory() {
+        return this.certificationsService.getHistory();
+    }
 };
 __decorate([
     Post('submit'),
@@ -100,6 +103,14 @@ __decorate([
     __metadata("design:paramtypes", [String, VerifyCertificationDto, Object]),
     __metadata("design:returntype", Promise)
 ], CertificationsController.prototype, "verify", null);
+__decorate([
+    Get('history'),
+    UseGuards(RolesGuard),
+    Roles('ADMIN'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], CertificationsController.prototype, "getHistory", null);
 CertificationsController = __decorate([
     Controller('certifications'),
     UseGuards(JwtAuthGuard),
